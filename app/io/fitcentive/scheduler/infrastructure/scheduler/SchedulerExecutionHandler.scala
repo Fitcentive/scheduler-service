@@ -2,7 +2,6 @@ package io.fitcentive.scheduler.infrastructure.scheduler
 
 import com.github.kagkarlsson.scheduler.task.{ExecutionContext, TaskInstance, VoidExecutionHandler}
 import io.circe.parser.decode
-import io.fitcentive.scheduler.api.SchedulerApi
 import io.fitcentive.scheduler.domain.events.{EventMessage, ScheduleMeetupReminderForLaterEvent}
 import io.fitcentive.scheduler.services.MessageBusService
 import io.fitcentive.sdk.logging.AppLogger
@@ -10,7 +9,7 @@ import io.fitcentive.sdk.logging.AppLogger
 import javax.inject.{Inject, Singleton}
 
 @Singleton
-class SchedulerExecutionHandler @Inject() (messageBus: MessageBusService, schedulerApi: SchedulerApi)
+class SchedulerExecutionHandler @Inject() (messageBus: MessageBusService)
   extends VoidExecutionHandler[String]
   with AppLogger {
 

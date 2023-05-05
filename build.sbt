@@ -2,7 +2,7 @@ name := "scheduler"
 
 version := "1.0"
 
-lazy val `meetup` = (project in file("."))
+lazy val `scheduler` = (project in file("."))
   .enablePlugins(PlayScala)
   .disablePlugins(PlayLogback)
 
