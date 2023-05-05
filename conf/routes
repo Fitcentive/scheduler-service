@@ -3,7 +3,4 @@
 # This file defines all application routes (Higher priority routes first)
 # ~~~~
 
-GET      /api/places/health                         app.place2meet.places.controllers.HealthController.healthCheck
-
-POST     /api/places/discover                       app.place2meet.places.controllers.PlacesController.fetchLocations
-      
+GET      /api/scheduler/health                                                          io.fitcentive.scheduler.controllers.HealthController.healthCheck

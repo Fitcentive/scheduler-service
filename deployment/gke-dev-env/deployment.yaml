@@ -1,0 +1,84 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: scheduler-service
+  namespace: scheduler
+  labels:
+    app: scheduler-service
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: scheduler-service
+  template:
+    metadata:
+      labels:
+        app: scheduler-service
+    spec:
+      containers:
+        # Sidecar container for cloudsql-proxy to connect to CloudSql database - recommended approach by Google for GKE
+        - name: cloudsql-proxy
+          image: gcr.io/cloudsql-docker/gce-proxy:1.33.1
+          command:
+            - /cloud_sql_proxy
+            - -instances=fitcentive-dev-02:northamerica-northeast2:gke-dev-env-cloud-sql-instance:=tcp:5432
+            - -credential_file=/secrets/cloudsql/credentials.json
+          volumeMounts:
+            - name: cloudsql-creds
+              mountPath: /secrets/cloudsql
+              readOnly: true
+        - name: scheduler-service
+          image: gcr.io/fitcentive-dev-02/scheduler:1.0
+          imagePullPolicy: Always
+          resources:
+            requests:
+              memory: 300Mi
+              cpu: "0.2"
+            limits:
+              memory: 500Mi
+              cpu: "0.5"
+          ports:
+            - name: http-port
+              containerPort: 9000
+          readinessProbe:
+            httpGet:
+              path: /api/scheduler/health
+              port: 9000
+            initialDelaySeconds: 30
+            periodSeconds: 30
+          livenessProbe:
+            httpGet:
+              path: /api/scheduler/health
+              port: 9000
+            initialDelaySeconds: 120
+            periodSeconds: 15
+          envFrom:
+            - secretRef:
+                name: internal-service-secret
+            - secretRef:
+                name: scheduler-service-service-account-credentials
+            - secretRef:
+                name: scheduler-service-cloudsql-database-credentials
+          env:
+            - name: GCP_PROJECT_NAME
+              value: "fitcentive-dev-02"
+            - name: DB_HOST
+              value: "localhost"
+            - name: DB_PORT
+              value: "5432"
+            - name: RUNTIME_ENVIRONMENT
+              value: "gke-dev-env"
+            - name: TOPIC_SCHEDULED_MEETUP_REMINDER
+              value: "scheduled-meetup-reminder"
+            - name: TOPIC_SCHEDULE_MEETUP_REMINDER_FOR_LATER
+              value: "schedule-meetup-reminder-for-later"
+            - name: TOPIC_CANCEL_SCHEDULED_MEETUP_REMINDER_FOR_LATER
+              value: "cancel-scheduled-meetup-reminder-for-later"
+            - name: SUBSCRIPTION_SCHEDULE_MEETUP_REMINDER_FOR_LATER
+              value: "schedule-meetup-reminder-for-later"
+            - name: SUBSCRIPTION_CANCEL_SCHEDULED_MEETUP_REMINDER_FOR_LATER
+              value: "cancel-scheduled-meetup-reminder-for-later"
+      volumes:
+        - name: cloudsql-creds
+          secret:
+            secretName: scheduler-service-cloudsql-instance-credentials
