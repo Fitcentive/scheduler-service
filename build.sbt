@@ -30,7 +30,9 @@ libraryDependencies ++= Seq(
   //Logging
   "ch.qos.logback"       % "logback-classic"          % "1.3.0-alpha10",
   "net.logstash.logback" % "logstash-logback-encoder" % "7.0.1",
-  specs2                 % Test,
+  // https://github.com/kagkarlsson/db-scheduler
+  "com.github.kagkarlsson" % "db-scheduler" % "12.1.0",
+  specs2                   % Test,
   guice
 )
 

@@ -11,6 +11,8 @@ import javax.inject.{Inject, Singleton}
 @Singleton
 class AppConfigService @Inject() (config: Configuration) extends SettingsService {
 
+  override def databaseConfig: DatabaseConfig = DatabaseConfig.fromConfig(config.get[Config]("db.default"))
+
   override def pubSubServiceAccountStringCredentials: String =
     config.get[String]("gcp.pubsub.service-account-string-credentials")
 
