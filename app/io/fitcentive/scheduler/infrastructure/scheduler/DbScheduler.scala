@@ -13,13 +13,15 @@ import io.fitcentive.scheduler.domain.scheduler.BackgroundScheduler
 import java.time.Instant
 import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
-import scala.util.Try
+import scala.util.{Failure, Success, Try}
 
 @Singleton
 class DbScheduler @Inject() (scheduler: Scheduler, oneTimeTask: Task[String])(implicit ec: ExecutionContext)
   extends BackgroundScheduler {
 
   import DbScheduler._
+
+  scheduler.start();
 
   override def schedule(eventMessage: EventMessage): Future[Unit] = {
     Future.fromTry {
@@ -30,11 +32,16 @@ class DbScheduler @Inject() (scheduler: Scheduler, oneTimeTask: Task[String])(im
             scheduler.cancel(TaskInstanceId.of(ScheduleOneTimePubSubMessageTaskName, taskId))
 
           case ScheduleMeetupReminderForLaterEvent(meetupId, later) =>
-            // First cancel any previous task for this event, if any
             val taskId = s"schedule-meetup-reminder-for-later-${meetupId.toString}"
             val taskInstance =
               oneTimeTask.instance(taskId, ScheduleMeetupReminderForLaterEvent(meetupId, later).asJson.noSpaces)
-            scheduler.schedule(taskInstance, Instant.ofEpochMilli(later))
+            Try {
+              // Optionally cancel task if it exists
+              scheduler.cancel(TaskInstanceId.of(ScheduleOneTimePubSubMessageTaskName, taskId))
+            } match {
+              case Failure(exception) => scheduler.schedule(taskInstance, Instant.ofEpochMilli(later))
+              case Success(value)     => scheduler.schedule(taskInstance, Instant.ofEpochMilli(later))
+            }
         }
       }
     }

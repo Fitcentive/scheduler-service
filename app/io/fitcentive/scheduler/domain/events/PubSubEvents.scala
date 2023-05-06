@@ -8,7 +8,7 @@ import io.fitcentive.sdk.utils.PubSubOps
 
 import java.util.UUID
 
-sealed trait EventMessage {}
+sealed trait EventMessage
 
 object EventMessage {
   implicit val codec: Codec[EventMessage] = deriveCodec[EventMessage]

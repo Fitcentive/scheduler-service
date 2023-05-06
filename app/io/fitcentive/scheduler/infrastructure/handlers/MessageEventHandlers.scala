@@ -7,10 +7,11 @@ import io.fitcentive.scheduler.domain.events.{
   EventMessage,
   ScheduleMeetupReminderForLaterEvent
 }
+import io.fitcentive.sdk.logging.AppLogger
 
 import scala.concurrent.{ExecutionContext, Future}
 
-trait MessageEventHandlers extends EventHandlers {
+trait MessageEventHandlers extends EventHandlers with AppLogger {
 
   def schedulerApi: SchedulerApi
   implicit def executionContext: ExecutionContext
@@ -18,6 +19,7 @@ trait MessageEventHandlers extends EventHandlers {
   override def handleEvent(event: EventMessage): Future[Unit] =
     event match {
       case event: ScheduleMeetupReminderForLaterEvent =>
+        logInfo("ScheduleMeetupReminderForLaterEvent received from Google PubSub")
         schedulerApi.scheduleMeetupReminderForLater(event.meetupId, event.scheduleReminderAtMillis).map(_ => ())
       case event: CancelScheduledMeetupForLaterEvent =>
         schedulerApi.cancelPreviouslyScheduledMeetupReminderForLater(event.meetupId).map(_ => ())
