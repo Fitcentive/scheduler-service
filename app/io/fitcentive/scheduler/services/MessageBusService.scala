@@ -9,4 +9,5 @@ import scala.concurrent.Future
 @ImplementedBy(classOf[EventPublisherService])
 trait MessageBusService {
   def publishScheduledMeetupReminder(meetupId: UUID): Future[Unit]
+  def publishScheduledMeetupStateTransition(meetupId: UUID): Future[Unit]
 }

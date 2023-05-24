@@ -3,11 +3,7 @@ package io.fitcentive.scheduler.infrastructure.scheduler
 import com.github.kagkarlsson.scheduler.Scheduler
 import com.github.kagkarlsson.scheduler.task.{Task, TaskInstanceId}
 import io.circe.syntax._
-import io.fitcentive.scheduler.domain.events.{
-  CancelScheduledMeetupForLaterEvent,
-  EventMessage,
-  ScheduleMeetupReminderForLaterEvent
-}
+import io.fitcentive.scheduler.domain.events._
 import io.fitcentive.scheduler.domain.scheduler.BackgroundScheduler
 
 import java.time.Instant
@@ -35,6 +31,25 @@ class DbScheduler @Inject() (scheduler: Scheduler, oneTimeTask: Task[String])(im
             val taskId = s"schedule-meetup-reminder-for-later-${meetupId.toString}"
             val taskInstance =
               oneTimeTask.instance(taskId, ScheduleMeetupReminderForLaterEvent(meetupId, later).asJson.noSpaces)
+            Try {
+              // Optionally cancel task if it exists
+              scheduler.cancel(TaskInstanceId.of(ScheduleOneTimePubSubMessageTaskName, taskId))
+            } match {
+              case Failure(exception) => scheduler.schedule(taskInstance, Instant.ofEpochMilli(later))
+              case Success(value)     => scheduler.schedule(taskInstance, Instant.ofEpochMilli(later))
+            }
+
+          case CancelPreviouslyScheduledMeetupStateTransitionForLaterEvent(meetupId) =>
+            val taskId = s"schedule-meetup-state-transition-for-later-${meetupId.toString}"
+            scheduler.cancel(TaskInstanceId.of(ScheduleOneTimePubSubMessageTaskName, taskId))
+
+          case ScheduleMeetupStateTransitionTimeForLaterEvent(meetupId, later) =>
+            val taskId = s"schedule-meetup-state-transition-for-later-${meetupId.toString}"
+            val taskInstance =
+              oneTimeTask.instance(
+                taskId,
+                ScheduleMeetupStateTransitionTimeForLaterEvent(meetupId, later).asJson.noSpaces
+              )
             Try {
               // Optionally cancel task if it exists
               scheduler.cancel(TaskInstanceId.of(ScheduleOneTimePubSubMessageTaskName, taskId))

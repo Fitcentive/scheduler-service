@@ -33,3 +33,36 @@ object CancelScheduledMeetupForLaterEvent extends PubSubOps {
   implicit val converter: PubSubMessageConverter[CancelScheduledMeetupForLaterEvent] =
     (message: PubsubMessage) => message.decodeUnsafe[CancelScheduledMeetupForLaterEvent]
 }
+
+//----------------------------------------
+
+case class ScheduleMeetupStateTransitionTimeForLaterEvent(meetupId: UUID, scheduleTransitionAtMillis: Long)
+  extends EventMessage
+
+object ScheduleMeetupStateTransitionTimeForLaterEvent extends PubSubOps {
+
+  implicit val codec: Codec[ScheduleMeetupStateTransitionTimeForLaterEvent] =
+    deriveCodec[ScheduleMeetupStateTransitionTimeForLaterEvent]
+
+  implicit val converter: PubSubMessageConverter[ScheduleMeetupStateTransitionTimeForLaterEvent] =
+    (message: PubsubMessage) => message.decodeUnsafe[ScheduleMeetupStateTransitionTimeForLaterEvent]
+}
+
+case class ScheduledMeetupStateTransitionEvent(meetupId: UUID) extends EventMessage
+
+object ScheduledMeetupStateTransitionEvent extends PubSubOps {
+  implicit val codec: Codec[ScheduledMeetupStateTransitionEvent] = deriveCodec[ScheduledMeetupStateTransitionEvent]
+
+  implicit val converter: PubSubMessageConverter[ScheduledMeetupStateTransitionEvent] =
+    (message: PubsubMessage) => message.decodeUnsafe[ScheduledMeetupStateTransitionEvent]
+}
+
+case class CancelPreviouslyScheduledMeetupStateTransitionForLaterEvent(meetupId: UUID) extends EventMessage
+
+object CancelPreviouslyScheduledMeetupStateTransitionForLaterEvent extends PubSubOps {
+  implicit val codec: Codec[CancelPreviouslyScheduledMeetupStateTransitionForLaterEvent] =
+    deriveCodec[CancelPreviouslyScheduledMeetupStateTransitionForLaterEvent]
+
+  implicit val converter: PubSubMessageConverter[CancelPreviouslyScheduledMeetupStateTransitionForLaterEvent] =
+    (message: PubsubMessage) => message.decodeUnsafe[CancelPreviouslyScheduledMeetupStateTransitionForLaterEvent]
+}

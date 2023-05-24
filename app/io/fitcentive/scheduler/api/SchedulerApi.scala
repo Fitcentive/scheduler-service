@@ -1,6 +1,11 @@
 package io.fitcentive.scheduler.api
 
-import io.fitcentive.scheduler.domain.events.{CancelScheduledMeetupForLaterEvent, ScheduleMeetupReminderForLaterEvent}
+import io.fitcentive.scheduler.domain.events.{
+  CancelPreviouslyScheduledMeetupStateTransitionForLaterEvent,
+  CancelScheduledMeetupForLaterEvent,
+  ScheduleMeetupReminderForLaterEvent,
+  ScheduleMeetupStateTransitionTimeForLaterEvent
+}
 import io.fitcentive.scheduler.infrastructure.scheduler.DbScheduler
 
 import java.util.UUID
@@ -24,4 +29,19 @@ class SchedulerApi @Inject() (dbScheduler: DbScheduler)(implicit ec: ExecutionCo
         dbScheduler.schedule(CancelScheduledMeetupForLaterEvent(meetupId))
       }
     }
+
+  def scheduleMeetupTransitionForLater(meetupId: UUID, scheduleAt: Long): Future[Unit] =
+    Future.fromTry {
+      Try {
+        dbScheduler.schedule(ScheduleMeetupStateTransitionTimeForLaterEvent(meetupId, scheduleAt))
+      }
+    }
+
+  def cancelPreviouslyScheduledMeetupTransitionForLater(meetupId: UUID): Future[Unit] =
+    Future.fromTry {
+      Try {
+        dbScheduler.schedule(CancelPreviouslyScheduledMeetupStateTransitionForLaterEvent(meetupId))
+      }
+    }
+
 }

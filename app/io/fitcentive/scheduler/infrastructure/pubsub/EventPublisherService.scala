@@ -1,6 +1,7 @@
 package io.fitcentive.scheduler.infrastructure.pubsub
 
-import io.fitcentive.registry.events.scheduled.ScheduledMeetupReminder
+import io.fitcentive.registry.events.scheduled.reminder.ScheduledMeetupReminder
+import io.fitcentive.registry.events.scheduled.transition.ScheduledMeetupStateTransition
 import io.fitcentive.scheduler.domain.config.TopicsConfig
 import io.fitcentive.scheduler.infrastructure.contexts.PubSubExecutionContext
 import io.fitcentive.scheduler.services.{MessageBusService, SettingsService}
@@ -17,6 +18,10 @@ class EventPublisherService @Inject() (publisher: PubSubPublisher, settingsServi
 ) extends MessageBusService {
 
   private val publisherConfig: TopicsConfig = settingsService.pubSubConfig.topicsConfig
+
+  override def publishScheduledMeetupStateTransition(meetupId: UUID): Future[Unit] =
+    ScheduledMeetupStateTransition(meetupId)
+      .pipe(publisher.publish(publisherConfig.scheduledMeetupStateTransitionTopic, _))
 
   override def publishScheduledMeetupReminder(meetupId: UUID): Future[Unit] =
     ScheduledMeetupReminder(meetupId)

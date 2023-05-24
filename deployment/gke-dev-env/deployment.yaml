@@ -68,16 +68,26 @@ spec:
               value: "5432"
             - name: RUNTIME_ENVIRONMENT
               value: "gke-dev-env"
+            - name: TOPIC_SCHEDULED_MEETUP_STATE_TRANSITION
+              value: "scheduled-meetup-state-transition"
             - name: TOPIC_SCHEDULED_MEETUP_REMINDER
               value: "scheduled-meetup-reminder"
             - name: TOPIC_SCHEDULE_MEETUP_REMINDER_FOR_LATER
               value: "schedule-meetup-reminder-for-later"
+            - name: TOPIC_SCHEDULE_MEETUP_STATE_TRANSITION_FOR_LATER
+              value: "schedule-meetup-state-transition-for-later"
             - name: TOPIC_CANCEL_SCHEDULED_MEETUP_REMINDER_FOR_LATER
               value: "cancel-scheduled-meetup-reminder-for-later"
+            - name: TOPIC_CANCEL_SCHEDULED_MEETUP_STATE_TRANSITION_FOR_LATER
+              value: "cancel-scheduled-meetup-state-transition-for-later"
             - name: SUBSCRIPTION_SCHEDULE_MEETUP_REMINDER_FOR_LATER
               value: "schedule-meetup-reminder-for-later"
+            - name: SUBSCRIPTION_SCHEDULE_MEETUP_STATE_TRANSITION_FOR_LATER
+              value: "schedule-meetup-state-transition-for-later"
             - name: SUBSCRIPTION_CANCEL_SCHEDULED_MEETUP_REMINDER_FOR_LATER
               value: "cancel-scheduled-meetup-reminder-for-later"
+            - name: SUBSCRIPTION_CANCEL_SCHEDULED_MEETUP_STATE_TRANSITION_FOR_LATER
+              value: "cancel-scheduled-meetup-state-transition-for-later"
       volumes:
         - name: cloudsql-creds
           secret:
