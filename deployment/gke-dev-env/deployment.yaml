@@ -21,22 +21,22 @@ spec:
           image: gcr.io/cloudsql-docker/gce-proxy:1.33.1
           command:
             - /cloud_sql_proxy
-            - -instances=fitcentive-dev-02:northamerica-northeast2:gke-dev-env-cloud-sql-instance:=tcp:5432
+            - -instances=fitcentive-dev-03:northamerica-northeast2:gke-dev-env-cloud-sql-instance:=tcp:5432
             - -credential_file=/secrets/cloudsql/credentials.json
           volumeMounts:
             - name: cloudsql-creds
               mountPath: /secrets/cloudsql
               readOnly: true
         - name: scheduler-service
-          image: gcr.io/fitcentive-dev-02/scheduler:1.0
+          image: gcr.io/fitcentive-dev-03/scheduler:1.0
           imagePullPolicy: Always
           resources:
             requests:
               memory: 300Mi
-              cpu: "0.2"
+              cpu: "0.1"
             limits:
               memory: 500Mi
-              cpu: "0.5"
+              cpu: "0.2"
           ports:
             - name: http-port
               containerPort: 9000
@@ -61,7 +61,7 @@ spec:
                 name: scheduler-service-cloudsql-database-credentials
           env:
             - name: GCP_PROJECT_NAME
-              value: "fitcentive-dev-02"
+              value: "fitcentive-dev-03"
             - name: DB_HOST
               value: "localhost"
             - name: DB_PORT
