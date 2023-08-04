@@ -35,7 +35,7 @@ spec:
               memory: 300Mi
               cpu: "0.1"
             limits:
-              memory: 500Mi
+              memory: 1500Mi
               cpu: "0.2"
           ports:
             - name: http-port
